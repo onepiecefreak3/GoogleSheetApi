@@ -48,11 +48,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auth\Listener.cs" />
     <Compile Include="GoogleSheet.cs" />
     <Compile Include="Models\Enums.cs" />
     <Compile Include="Models\General.cs" />
     <Compile Include="Models\Sheet.cs" />
     <Compile Include="Models\SheetsResponse.cs" />
+    <Compile Include="Auth\OAuth2.cs" />
+    <Compile Include="Models\TokenResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\Client.cs" />
   </ItemGroup>

@@ -1,16 +1,18 @@
-﻿using GoogleSheetsApiV4.Models;
-using GoogleSheetsV4.Models;
-using GoogleSheetsV4.Support;
+﻿using GoogleSheetsApiV4.Auth;
+using GoogleSheetsApiV4.Models;
+using GoogleSheetsApiV4.Support;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GoogleSheetsV4
+namespace GoogleSheetsApiV4
 {
     /* Explaining authorization methods for Google Apis
      * 
@@ -43,8 +45,7 @@ namespace GoogleSheetsV4
 
         private string _apiKey;
 
-        private string _clientId;
-        private string _clientSecret;
+        private OAuth2 _oauth2;
 
         private string _baseUrl = "https://sheets.googleapis.com";
         private string _resource = "v4/spreadsheets";
@@ -52,6 +53,8 @@ namespace GoogleSheetsV4
         private Client _client;
         private KeyType _type;
         private Scope _scope;
+
+        private Random _rand = new Random();
 
         public GoogleSheet(string sheetId, string apiKey)
         {
@@ -68,8 +71,7 @@ namespace GoogleSheetsV4
             _type = KeyType.OAuth2;
             _scope = scope;
 
-            _clientId = clientId;
-            _clientSecret = clientSecret;
+            _oauth2 = new OAuth2(clientId, clientSecret, scope);
 
             Initialize(sheetId);
         }
@@ -144,6 +146,8 @@ namespace GoogleSheetsV4
                     _client.AddQueryParameter("key", _apiKey);
                     break;
                 case KeyType.OAuth2:
+                    var access_token = _oauth2.RetrieveAccessToken();
+                    _client.AddHeader("Authorization", $"Bearer {access_token}");
                     break;
             }
         }
@@ -156,6 +160,7 @@ namespace GoogleSheetsV4
                     _client.ClearQueryParameters();
                     break;
                 case KeyType.OAuth2:
+                    _client.ClearHeaders();
                     break;
             }
         }

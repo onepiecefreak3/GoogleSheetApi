@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GoogleSheetsV4.Support
+namespace GoogleSheetsApiV4.Support
 {
     internal class Client
     {
+        private string _baseUrl;
         private RestClient _client;
 
         private List<(string Name, string Value)> _headers;
@@ -18,6 +19,7 @@ namespace GoogleSheetsV4.Support
 
         public Client(string baseUrl)
         {
+            _baseUrl = baseUrl;
             _client = new RestClient(baseUrl);
 
             _headers = new List<(string, string)>();
@@ -33,7 +35,7 @@ namespace GoogleSheetsV4.Support
 
         public IRestResponse Post(string resource)
         {
-            var request = new RestRequest(resource, Method.GET);
+            var request = new RestRequest(resource, Method.POST);
             return Send(request);
         }
 
@@ -54,9 +56,34 @@ namespace GoogleSheetsV4.Support
             foreach (var param in _queryParams)
                 request.AddQueryParameter(param.Name, param.Value);
 
-            request.AddJsonBody(_jsonBody);
+            if (!string.IsNullOrEmpty(_jsonBody))
+                request.AddJsonBody(_jsonBody);
 
             return _client.Execute(request);
+        }
+
+        public string BuildAbsoluteUri(string resource)
+        {
+            string path;
+
+            if (string.IsNullOrEmpty(resource))
+                path = _baseUrl;
+            else if (_baseUrl.EndsWith("/") && resource.StartsWith("/"))
+                path = _baseUrl + resource.Remove(0, 1);
+            else if (!_baseUrl.EndsWith("/") && !resource.StartsWith("/"))
+                path = _baseUrl + "/" + resource;
+            else
+                path = _baseUrl + resource;
+
+            path += "?";
+            for (int i = 0; i < _queryParams.Count; i++)
+            {
+                path += _queryParams[i].Name + "=" + _queryParams[i].Value;
+                if (i + 1 != _queryParams.Count)
+                    path += "&";
+            }
+
+            return path;
         }
 
         public void AddQueryParameter(string name, string value)
@@ -82,6 +109,11 @@ namespace GoogleSheetsV4.Support
         public void ClearQueryParameters()
         {
             _queryParams.Clear();
+        }
+
+        public void ClearHeaders()
+        {
+            _headers.Clear();
         }
     }
 }

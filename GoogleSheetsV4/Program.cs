@@ -1,11 +1,12 @@
-﻿using System;
+﻿using GoogleSheetsApiV4;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GoogleSheetsV4
+namespace ConsoleApplication
 {
     class Program
     {
@@ -32,7 +33,8 @@ namespace GoogleSheetsV4
                 Console.WriteLine($"No sheetId found with name \"{name}\"");
             }
 
-            var sheet = new GoogleSheet(sheetId, _apiKey);
+            var sheet = new GoogleSheet(sheetId, _clientId, _clientSecret);
+            //var sheet = new GoogleSheet(sheetId, _apiKey);
             var chapterEntries = GetTimeTravelersTips(sheet, 1).ToList();
         }
 
