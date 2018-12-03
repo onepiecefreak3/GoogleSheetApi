@@ -12,6 +12,25 @@ using System.Threading.Tasks;
 
 namespace GoogleSheetsV4
 {
+    /* Explaining authorization methods for Google Apis
+     * 
+     * ApiKey:
+     * The ApiKey will be created and managed in ones google development console, it only needs to be created once and needs to be given some restricitive permissions.
+     * The ApiKey will be added as a query parameter to the each request.
+     * The ApiKey method can't be used for write operations seemingly
+     * 
+     * OAuth2:
+     * OAuth2 is a protocol needing 3 endpoints to verify and authorize an operation with an OAuth token.
+     * One must create a clientId and clientSecret in the google development console and a trusted domain running
+     * an own Api of any sort. (JS, C# webapi)
+     * ClientId, clientSecret and other required information get send to the google auth endpoint with a specific scope,
+     * which will again make a request to the trusted domain with your api on it, which verifies the token request by
+     * googles auth endpoint
+     * After the endpoints verified the chain of trust, the main application will receive an active OAuth token and maybe a refresh token,
+     * for when the OAuth token expired
+     * The OAuth token will then be attached to every operation
+     */
+
     public class GoogleSheet
     {
         private enum Mode
