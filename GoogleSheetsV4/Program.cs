@@ -1,4 +1,5 @@
 ﻿using GoogleSheetsApiV4;
+using GoogleSheetsV4;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,28 +47,29 @@ namespace ConsoleApplication
 
         private static IEnumerable<Entry> GetTimeTravelersTips(GoogleSheet sheet, int chapter)
         {
-            var chapters = sheet.GetRange("TIPS", "B2", "B447");
-            var titles = sheet.GetRange("TIPS", "E2", "G447");
-            var finalTexts = sheet.GetRange("TIPS", "K2", "K447");
+            var chapters = sheet.GetRange<Tips>("TIPS", "B2", "K447");
+            return null;
+            //var titles = sheet.GetRange("TIPS", "E2", "G447");
+            //var finalTexts = sheet.GetRange("TIPS", "K2", "K447");
 
-            for (int i = 0; i < 445; i++)
-            {
-                if (int.Parse(chapters[i][0].ToString()) == chapter)
-                {
-                    if (finalTexts[i].Count <= 0)
-                        Console.WriteLine(i);
-                    else
-                    {
-                        yield return new Entry
-                        {
-                            OriginalTitle = titles[i][0].ToString(),
-                            OriginalTitleEscaped = titles[i][1].ToString(),
-                            TranslatedTitle = titles[i][2].ToString(),
-                            FinalText = finalTexts[i][0].ToString()
-                        };
-                    }
-                }
-            }
+            //for (int i = 0; i < 445; i++)
+            //{
+            //    if (int.Parse(chapters[i][0].ToString()) == chapter)
+            //    {
+            //        if (finalTexts[i].Count <= 0)
+            //            Console.WriteLine(i);
+            //        else
+            //        {
+            //            yield return new Entry
+            //            {
+            //                OriginalTitle = titles[i][0].ToString(),
+            //                OriginalTitleEscaped = titles[i][1].ToString(),
+            //                TranslatedTitle = titles[i][2].ToString(),
+            //                FinalText = finalTexts[i][0].ToString()
+            //            };
+            //        }
+            //    }
+            //}
         }
 
         private class Entry

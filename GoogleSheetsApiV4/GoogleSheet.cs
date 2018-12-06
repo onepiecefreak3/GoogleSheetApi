@@ -1,4 +1,5 @@
-﻿using GoogleSheetsApiV4.Auth;
+﻿using GoogleSheetsApiV4.Attributes;
+using GoogleSheetsApiV4.Auth;
 using GoogleSheetsApiV4.Models;
 using GoogleSheetsApiV4.Support;
 using Newtonsoft.Json;
@@ -101,7 +102,7 @@ namespace GoogleSheetsApiV4
             return GetSheet().Sheets.Select(x => x.Properties.Title);
         }
 
-        public List<List<object>> GetRange(string tableName, string start, string end)
+        public IEnumerable<T> GetRange<T>(string tableName, string start, string end)
         {
             SetupClient();
 
@@ -110,7 +111,9 @@ namespace GoogleSheetsApiV4
             {
                 ResetClient();
 
-                var result = JObject.Parse(response.Content)["values"].ToObject<List<List<object>>>();
+                var result = JObject.Parse(response.Content)["values"].ToObject<List<List<object>>>().ParseType<T>(start, end).ToList();
+                var list = Extension.CreateLetterRange("A", "AB").ToList();
+
                 return result;
             }
             else

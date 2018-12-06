@@ -176,7 +176,7 @@ namespace GoogleSheetsApiV4.Auth
 
             for (int i = 0; i < length; i++)
             {
-                var randChar = (char)_rand.Next(0x20, 0x7F);
+                var randChar = (char)_rand.Next(0x41, 0x5A);
                 sb.Append(randChar);
             }
 
