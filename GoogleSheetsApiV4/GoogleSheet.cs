@@ -112,7 +112,7 @@ namespace GoogleSheetsApiV4
                 ResetClient();
 
                 var result = JObject.Parse(response.Content)["values"].ToObject<List<List<object>>>().ParseType<T>(start, end).ToList();
-                var list = Extension.CreateLetterRange("A", "AB").ToList();
+                var list = Extension.CreateLetterRange(start, end).ToList();
 
                 return result;
             }
