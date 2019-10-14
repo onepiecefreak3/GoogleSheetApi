@@ -29,17 +29,18 @@ namespace GoogleSheetsV4
                     ParseCommand(arg);
                 else
                 {
-                    var parameter = ParseParameter(arg);
+                    var parsedCommand = _parsedCommand;
+                    if (!values.ContainsKey(parsedCommand) || values[parsedCommand] == null)
+                        values[parsedCommand] = new List<string>();
 
-                    if (!values.ContainsKey(_parsedCommand) || values[_parsedCommand] == null)
-                        values[_parsedCommand] = new List<string>();
-                    values[_parsedCommand].Add(parameter);
+                    var parameter = ParseParameter(arg);
+                    values[parsedCommand].Add(parameter);
                 }
             }
 
-            return new ParsedOptions(values["-s"].FirstOrDefault(),
-                values[".ci"].FirstOrDefault(),
-                values["-cs"].FirstOrDefault());
+            return new ParsedOptions(values.GetValueOrDefault("-s")?.FirstOrDefault(),
+                values.GetValueOrDefault("-ci")?.FirstOrDefault(),
+                values.GetValueOrDefault("-cs")?.FirstOrDefault());
         }
 
         #region Private methods

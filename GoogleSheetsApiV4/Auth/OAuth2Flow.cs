@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace GoogleSheetsApiV4.Auth
@@ -177,7 +178,7 @@ namespace GoogleSheetsApiV4.Auth
         {
             using (var listener = new BasicListener(_redirectUri).Start())
             {
-                Process.Start(GetAuthUri(state));
+                OpenUrl(GetAuthUri(state));
 
                 var request = listener.AwaitRequest();
                 return request.QueryString;
@@ -205,6 +206,24 @@ namespace GoogleSheetsApiV4.Auth
             client.ClearQueryParameters();
 
             return uri;
+        }
+
+        /// <summary>
+        /// Open a specified url.
+        /// </summary>
+        /// <param name="url">The url to open.</param>
+        /// <remarks>https://github.com/dotnet/corefx/issues/10361</remarks>
+        private void OpenUrl(string url)
+        {
+            Contract.EnsureNotNull(url, nameof(url));
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            };
+
+            Process.Start(psi);
         }
 
         /// <summary>

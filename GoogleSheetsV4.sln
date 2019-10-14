@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication", "GoogleSheetsV4\ConsoleApplication.csproj", "{381917AF-0EAB-44EA-8D9F-30F07AE50AC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleSheetsV4", "GoogleSheetsV4\GoogleSheetsV4.csproj", "{381917AF-0EAB-44EA-8D9F-30F07AE50AC4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleSheetsApiV4", "GoogleSheetsApiV4\GoogleSheetsApiV4.csproj", "{ED16EEF2-4448-4259-B1CB-66E494CF4EF6}"
 EndProject
