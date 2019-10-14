@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace GoogleSheetsApiV4.Auth
@@ -93,7 +92,6 @@ namespace GoogleSheetsApiV4.Auth
         /// Create a new access token by using the refresh token.
         /// </summary>
         /// <returns>Valid access token.</returns>
-        //TODO: Refresh accessToken Test
         private string RefreshAccessToken()
         {
             var tokenResponse = ExchangeRefreshToken();
