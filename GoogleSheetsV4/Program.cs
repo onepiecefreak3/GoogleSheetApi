@@ -1,54 +1,27 @@
-﻿using GoogleSheetsApiV4;
-using GoogleSheetsV4;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
+using GoogleSheetsApiV4;
+using GoogleSheetsV4.Models;
 
-namespace ConsoleApplication
+namespace GoogleSheetsV4
 {
     class Program
     {
-        static Dictionary<string, string> _sheetIds = new Dictionary<string, string>
-        {
-            ["Time Travelers"] = "1RAQBCtGgDYjLEuCqt9oE5nuK297tPegk6LbS1sqY1ek",
-            ["Test"] = "1sSYYvuxuX5r4URl-0F7h8p45iepdRMXGCDUtb3vVxwU"
-        };
+        static readonly OptionsParser Parser = new OptionsParser();
 
         static void Main(string[] args)
         {
-            string sheetId = null;
-            while (true)
-            {
-                ListSheetIds();
+            var options = Parser.Parse(args);
+            var sheet = new GoogleSheet(options.SheetId, options.ClientId, options.ClientSecret);
 
-                var name = Console.ReadLine();
-                if (_sheetIds.ContainsKey(name))
-                {
-                    sheetId = _sheetIds[name];
-                    break;
-                }
-
-                Console.WriteLine($"No sheetId found with name \"{name}\"");
-            }
-
-            var sheet = new GoogleSheet(sheetId, _clientId, _clientSecret);
-            //var sheet = new GoogleSheet(sheetId, _apiKey);
+            // Custom code per game
             var chapterEntries = GetTimeTravelersTips(sheet, 1).ToList();
         }
 
-        private static void ListSheetIds()
-        {
-            foreach (var sheetId in _sheetIds)
-                Console.WriteLine(sheetId.Key);
-        }
-
-        private static IEnumerable<Entry> GetTimeTravelersTips(GoogleSheet sheet, int chapter)
+        private static IEnumerable<Tips> GetTimeTravelersTips(GoogleSheet sheet, int chapter)
         {
             var chapters = sheet.GetRange<Tips>("TIPS", "B2", "K447");
-            return null;
+            return chapters;
             //var titles = sheet.GetRange("TIPS", "E2", "G447");
             //var finalTexts = sheet.GetRange("TIPS", "K2", "K447");
 
@@ -70,14 +43,6 @@ namespace ConsoleApplication
             //        }
             //    }
             //}
-        }
-
-        private class Entry
-        {
-            public string OriginalTitle { get; set; }
-            public string OriginalTitleEscaped { get; set; }
-            public string TranslatedTitle { get; set; }
-            public string FinalText { get; set; }
         }
     }
 }

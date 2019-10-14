@@ -1,11 +1,6 @@
 ﻿using GoogleSheetsApiV4.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GoogleSheetsV4
+namespace GoogleSheetsV4.Models
 {
     public class Tips
     {
@@ -22,6 +17,6 @@ namespace GoogleSheetsV4
         public string TranslatedTitle { get; set; }
 
         [Column("K")]
-        public string Finaltext { get; set; }
+        public string FinalText { get; set; }
     }
 }
