@@ -6,15 +6,9 @@ using System.Threading.Tasks;
 
 namespace GoogleSheetsApiV4.Models
 {
-    public enum KeyType
+    public enum AccessMode
     {
-        ApiKey,
-        OAuth2
-    }
-
-    public enum Scope
-    {
-        ReadOnly,
-        ReadWrite
+        Read,
+        Write
     }
 }

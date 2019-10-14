@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 
 namespace GoogleSheetsApiV4.Models
 {
-    internal class TokenResponse
+    class TokenResponse
     {
-        public string Access_token { get; set; }
-        public int Expires_in { get; set; }
-        public string Refresh_token { get; set; }
+        [JsonProperty("access_token")]
+        public string AccessToken { get; set; }
+        [JsonProperty("expires_in")]
+        public int ExpiresIn { get; set; }
+        [JsonProperty("refresh_token")]
+        public string RefreshToken { get; set; }
         public string Scope { get; set; }
-        public string Token_type { get; set; }
-        public string Id_token { get; set; }
+        [JsonProperty("token_type")]
+        public string TokenType { get; set; }
+        [JsonProperty("id_token")]
+        public string IdToken { get; set; }
     }
 }
