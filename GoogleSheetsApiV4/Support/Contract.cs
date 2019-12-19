@@ -11,7 +11,7 @@ namespace GoogleSheetsApiV4.Support
     static class Contract
     {
         /// <summary>
-        /// Ensure that the value is not null.
+        /// Ensure that the given value is not <see langword="null"/>.
         /// </summary>
         /// <param name="value">The value to ensure.</param>
         /// <param name="valueName">Name of the value.</param>
@@ -22,7 +22,7 @@ namespace GoogleSheetsApiV4.Support
         }
 
         /// <summary>
-        /// Ensures that given value is part of <typeparamref name="TEnum"/>.
+        /// Ensures that the given value is part of <typeparamref name="TEnum"/>.
         /// </summary>
         /// <typeparam name="TEnum">The type of the enum.</typeparam>
         /// <param name="value">The value to ensure.</param>
@@ -35,14 +35,14 @@ namespace GoogleSheetsApiV4.Support
         }
 
         /// <summary>
-        /// Ensure that the access mode is allowed in the scope.
+        /// Ensures that the given value is <see langword="true" />.
         /// </summary>
-        /// <param name="accessMode">The access mode to ensure.</param>
-        /// <param name="scope">The scope to ensure the access mode in.</param>
-        public static void EnsureAccessModeAllowed(AccessMode accessMode, Scope scope)
+        /// <param name="value">The value to ensure.</param>
+        /// <param name="valueName">Name of the value.</param>
+        public static void EnsureTrue(bool value, string valueName)
         {
-            if (accessMode == AccessMode.Write && scope == Scope.ReadOnly)
-                throw new InvalidOperationException("Operation needs write permission, but the scope is read-only.");
+            if (!value)
+                throw new InvalidOperationException($"The value '{valueName}' was false.");
         }
 
         /// <summary>
@@ -52,8 +52,7 @@ namespace GoogleSheetsApiV4.Support
         /// <param name="rangeName">Name of the range element.</param>
         public static void EnsureRangePattern(string range, string rangeName)
         {
-            var regexPattern = "[A-Z]+\\d+";
-            if (!Regex.IsMatch(range, regexPattern))
+            if (!Regex.IsMatch(range, "[A-Z]+\\d+"))
                 throw new InvalidOperationException($"The value '{range}' in '{rangeName}' has an invalid pattern.");
         }
     }

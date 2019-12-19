@@ -1,19 +1,19 @@
 ﻿using GoogleSheetsApiV4.Models;
 using GoogleSheetsApiV4.Support;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using RestSharp;
 
 namespace GoogleSheetsApiV4.Auth
 {
     /// <summary>
     /// Implements the OAuth2 flow for authorization at google services.
     /// </summary>
-    class OAuth2Flow
+    class OAuth2CodeFlow : ICodeFlow
     {
         private readonly Dictionary<Scope, string> _scopeUrls = new Dictionary<Scope, string>
         {
@@ -24,7 +24,6 @@ namespace GoogleSheetsApiV4.Auth
         private readonly Random _rand = new Random();
         private readonly string _clientId;
         private readonly string _clientSecret;
-        private readonly Scope _scope;
 
         private string _baseAuthUrl = "https://accounts.google.com/o/";
         private string _authResource = "oauth2/v2/auth";
@@ -38,24 +37,47 @@ namespace GoogleSheetsApiV4.Auth
         private string _refreshToken;
         private DateTime _expiration;
 
+        /// <inheritdoc cref="Scope"/>
+        public Scope Scope { get; }
+
+        /// <inheritdoc cref="CanRead"/>
+        public bool CanRead => Scope == Scope.ReadOnly || Scope == Scope.ReadWrite;
+
+        /// <inheritdoc cref="CanWrite"/>
+        public bool CanWrite => Scope == Scope.ReadWrite;
+
         /// <summary>
-        /// Initializes a new instance of <see cref="OAuth2Flow"/>.
+        /// Initializes a new instance of <see cref="OAuth2CodeFlow"/>.
         /// </summary>
         /// <param name="clientId">The client id to authorize with.</param>
         /// <param name="clientSecret">The client secret to authorize with.</param>
         /// <param name="scope">The scope of the sheet.</param>
-        public OAuth2Flow(string clientId, string clientSecret, Scope scope)
+        public OAuth2CodeFlow(string clientId, string clientSecret, Scope scope)
         {
+            Contract.EnsureNotNull(clientId, nameof(clientId));
+            Contract.EnsureNotNull(clientSecret, nameof(clientSecret));
+            Contract.EnsureMemberOfEnum(scope, nameof(scope));
+
             _clientId = clientId;
             _clientSecret = clientSecret;
-            _scope = scope;
+            Scope = scope;
+        }
+
+        /// <inheritdoc cref="CreateRequest"/>
+        public IRestRequest CreateRequest(string relativeUri)
+        {
+            var request = new RestRequest(relativeUri);
+
+            request.AddHeader("Authorization", $"Bearer {RetrieveAccessToken()}");
+
+            return request;
         }
 
         /// <summary>
         /// Retrieves a valid access token.
         /// </summary>
         /// <returns>A valid access token.</returns>
-        public string RetrieveAccessToken()
+        private string RetrieveAccessToken()
         {
             // If access token is not expired, return it
             if (_expiration > DateTime.UtcNow)
@@ -108,19 +130,20 @@ namespace GoogleSheetsApiV4.Auth
         /// <returns>The authorization response.</returns>
         private TokenResponse ExchangeAuthCode(string code)
         {
-            var client = new Client(_baseTokenUrl);
+            var client = new RestClient(_baseTokenUrl);
 
-            client.AddQueryParameter("code", code);
-            client.AddQueryParameter("client_id", _clientId);
-            client.AddQueryParameter("client_secret", _clientSecret);
-            client.AddQueryParameter("redirect_uri", _redirectUri);
-            client.AddQueryParameter("grant_type", "authorization_code");
+            var request = new RestRequest(_tokenResource);
+            request.AddQueryParameter("code", code);
+            request.AddQueryParameter("client_id", _clientId);
+            request.AddQueryParameter("client_secret", _clientSecret);
+            request.AddQueryParameter("redirect_uri", _redirectUri);
+            request.AddQueryParameter("grant_type", "authorization_code");
 
-            var response = client.Post(_tokenResource);
+            var response = client.Post<TokenResponse>(request);
             if (!response.IsSuccessful)
                 throw new InvalidDataException(response.ErrorMessage);
 
-            return JObject.Parse(response.Content).ToObject<TokenResponse>();
+            return response.Data;
         }
 
         /// <summary>
@@ -129,18 +152,19 @@ namespace GoogleSheetsApiV4.Auth
         /// <returns>The authorization response.</returns>
         private TokenResponse ExchangeRefreshToken()
         {
-            var client = new Client(_baseTokenUrl);
+            var client = new RestClient(_baseTokenUrl);
 
-            client.AddQueryParameter("refresh_token", _refreshToken);
-            client.AddQueryParameter("client_id", _clientId);
-            client.AddQueryParameter("client_secret", _clientSecret);
-            client.AddQueryParameter("grant_type", "refresh_token");
+            var request = new RestRequest(_tokenResource);
+            request.AddQueryParameter("refresh_token", _refreshToken);
+            request.AddQueryParameter("client_id", _clientId);
+            request.AddQueryParameter("client_secret", _clientSecret);
+            request.AddQueryParameter("grant_type", "refresh_token");
 
-            var response = client.Post(_tokenResource);
+            var response = client.Post<TokenResponse>(request);
             if (!response.IsSuccessful)
                 throw new InvalidDataException(response.ErrorMessage);
 
-            return JObject.Parse(response.Content).ToObject<TokenResponse>();
+            return response.Data;
         }
 
         /// <summary>
@@ -174,13 +198,11 @@ namespace GoogleSheetsApiV4.Auth
         /// <returns>The authorization response.</returns>
         private NameValueCollection RetrieveAuthQuery(string state)
         {
-            using (var listener = new BasicListener(_redirectUri).Start())
-            {
-                OpenUrl(GetAuthUri(state));
+            using var listener = new BasicListener(_redirectUri).Start();
+            OpenUrl(GetAuthUri(state));
 
-                var request = listener.AwaitRequest();
-                return request.QueryString;
-            }
+            var request = listener.AwaitRequest();
+            return request.QueryString;
         }
 
         /// <summary>
@@ -190,20 +212,18 @@ namespace GoogleSheetsApiV4.Auth
         /// <returns>The authorization uri.</returns>
         private string GetAuthUri(string state)
         {
-            var client = new Client(_baseAuthUrl);
+            var client = new RestClient(_baseAuthUrl);
 
-            client.AddQueryParameter("client_id", _clientId);
-            client.AddQueryParameter("response_type", "code");
-            client.AddQueryParameter("scope", $"{_scopeUrls[_scope]}");
-            client.AddQueryParameter("redirect_uri", _redirectUri);
-            client.AddQueryParameter("state", state);
-            client.AddQueryParameter("nonce", GetRandomString(10));
-            client.AddQueryParameter("access_type", "offline");
+            var request = new RestRequest(_authResource);
+            request.AddQueryParameter("client_id", _clientId);
+            request.AddQueryParameter("response_type", "code");
+            request.AddQueryParameter("scope", $"{_scopeUrls[Scope]}");
+            request.AddQueryParameter("redirect_uri", _redirectUri);
+            request.AddQueryParameter("state", state);
+            request.AddQueryParameter("nonce", GetRandomString(10));
+            request.AddQueryParameter("access_type", "offline");
 
-            var uri = client.BuildAbsoluteUri(_authResource);
-            client.ClearQueryParameters();
-
-            return uri;
+            return client.BuildUri(request).AbsoluteUri;
         }
 
         /// <summary>
