@@ -4,6 +4,7 @@ using GoogleSheetsApiV4.Support;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using GoogleSheetsApiV4.Models.Update;
 using RestSharp;
 using RestSharp.Serializers.Newtonsoft.Json;
@@ -67,6 +68,19 @@ namespace GoogleSheetsApiV4
         /// <param name="scope">The scope of the sheet.</param>
         public GoogleSpreadSheet(string spreadSheetId, string clientId, string clientSecret, Scope scope = Scope.ReadOnly) :
             this(spreadSheetId, new OAuth2CodeFlow(clientId, clientSecret, scope))
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="GoogleSpreadSheet"/> with ApiKey authorization.
+        /// </summary>
+        /// <param name="spreadSheetId">The sheet to work with.</param>
+        /// <param name="clientId">The client id to authorize with.</param>
+        /// <param name="clientSecret">The client secret to authorize with.</param>
+        /// <param name="refreshToken">The RefreshToken for this spreadsheet.</param>
+        /// <param name="scope">The scope of the sheet.</param>
+        public GoogleSpreadSheet(string spreadSheetId, string clientId, string clientSecret, string refreshToken, Scope scope = Scope.ReadOnly) :
+            this(spreadSheetId, new OAuth2CodeFlow(clientId, clientSecret, scope, refreshToken))
         {
         }
 
@@ -135,7 +149,7 @@ namespace GoogleSheetsApiV4
         /// <param name="end">The line and column to end at.</param>
         /// <returns>Parsed result of the ranged data.</returns>
         /// <exception cref="InvalidDataException">If the request was not successful.</exception>
-        public IEnumerable<TParse> GetRange<TParse>(string sheetTitle, string start, string end)
+        public async Task<IEnumerable<TParse>> GetRange<TParse>(string sheetTitle, string start, string end)
         {
             Contract.EnsureNotNull(sheetTitle, nameof(sheetTitle));
             Contract.EnsureNotNull(start, nameof(start));
@@ -146,14 +160,11 @@ namespace GoogleSheetsApiV4
 
             var sheetRequest = _codeFlow.CreateRequest($"{_resource}/{SpreadSheetId}/values/{sheetTitle}!{start}:{end}");
 
-            var response = _client.Get<ValueRange>(sheetRequest);
-            if (!response.IsSuccessful)
-                throw new InvalidDataException(response.Content);
-
-            return response.Data.Values.ParseType<TParse>(start, end);
+            var valueRange = await _client.GetAsync<ValueRange>(sheetRequest);
+            return valueRange.Values.ParseType<TParse>(start, end);
         }
 
-        public void UpdateRange<TUpdate>(IList<TUpdate> update, string sheetTitle, string start, string end)
+        public async void UpdateRange<TUpdate>(IList<TUpdate> update, string sheetTitle, string start, string end)
         {
             Contract.EnsureNotNull(update, nameof(update));
             Contract.EnsureNotNull(start, nameof(start));
@@ -166,38 +177,15 @@ namespace GoogleSheetsApiV4
             sheetRequest.JsonSerializer = new NewtonsoftJsonSerializer();
 
             var updateCellRequest = update.CreateUpdateCellsRequest(GetSheetId(sheetTitle), start, end);
-            var requestBody = new RequestBody
+            var requestBody = new Models.Update.RequestBody
             {
                 Requests = new object[] { new { updateCells = updateCellRequest } }
             };
             sheetRequest.AddJsonBody(requestBody);
 
-            var response = _client.Post(sheetRequest);
-            if (!response.IsSuccessful)
-                throw new InvalidDataException(response.Content);
+            await _client.PostAsync<object>(sheetRequest);
         }
 
         #endregion
-
-        //public void UpdateRange(List<List<object>> range, string sheetTitle, string start, string end)
-        //{
-        //    if (_type == KeyType.ApiKey)
-        //        throw new InvalidOperationException("ApiKey can't be used for updating.");
-
-        //    var body = new JObject();
-        //    body.Add("values", JArray.FromObject(range));
-
-        //    _client.SetJsonBody(JsonConvert.SerializeObject(body));
-
-        //    var response = _client.Put($"{_resource}/{_sheetId}/values/{sheetTitle}!{start}:{end}");
-        //    if (response.IsSuccessful)
-        //    {
-        //        var result = JObject.Parse(response.Content)["values"].ToObject<List<List<object>>>();
-        //    }
-        //    else
-        //    {
-        //        throw new InvalidDataException(response.ErrorMessage);
-        //    }
-        //}
     }
 }

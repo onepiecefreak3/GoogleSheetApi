@@ -63,6 +63,26 @@ namespace GoogleSheetsApiV4.Auth
             Scope = scope;
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="OAuth2CodeFlow"/>.
+        /// </summary>
+        /// <param name="clientId">The client id to authorize with.</param>
+        /// <param name="clientSecret">The client secret to authorize with.</param>
+        /// <param name="scope">The scope of the sheet.</param>
+        /// <param name="refreshToken">The RefreshToken for this flow.</param>
+        public OAuth2CodeFlow(string clientId, string clientSecret, Scope scope, string refreshToken)
+        {
+            Contract.EnsureNotNull(clientId, nameof(clientId));
+            Contract.EnsureNotNull(clientSecret, nameof(clientSecret));
+            Contract.EnsureNotNull(refreshToken, nameof(refreshToken));
+            Contract.EnsureMemberOfEnum(scope, nameof(scope));
+
+            _clientId = clientId;
+            _clientSecret = clientSecret;
+            _refreshToken = refreshToken;
+            Scope = scope;
+        }
+
         /// <inheritdoc cref="CreateRequest"/>
         public IRestRequest CreateRequest(string relativeUri)
         {
