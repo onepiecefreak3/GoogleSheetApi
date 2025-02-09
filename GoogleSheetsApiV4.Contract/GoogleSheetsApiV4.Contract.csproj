@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>GoogleSheetsApiV4</RootNamespace>
-    <AssemblyName>GoogleSheetsApiV4</AssemblyName>
+    <RootNamespace>GoogleSheetsApiV4.Contract</RootNamespace>
+    <AssemblyName>GoogleSheetsApiV4.Contract</AssemblyName>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>

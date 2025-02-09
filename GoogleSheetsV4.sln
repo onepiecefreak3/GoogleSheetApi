@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29403.142
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35514.174 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleSheetsApiV4", "GoogleSheetsApiV4\GoogleSheetsApiV4.csproj", "{ED16EEF2-4448-4259-B1CB-66E494CF4EF6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleSheetsApiV4.Contract", "GoogleSheetsApiV4.Contract\GoogleSheetsApiV4.Contract.csproj", "{E82865BA-8485-40F7-9775-2485ACE3419E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleSheetsApiV4", "GoogleSheetsApiV4\GoogleSheetsApiV4.csproj", "{9BCC11AD-1DF8-491B-8F41-0AE2EEA362B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ED16EEF2-4448-4259-B1CB-66E494CF4EF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED16EEF2-4448-4259-B1CB-66E494CF4EF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED16EEF2-4448-4259-B1CB-66E494CF4EF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED16EEF2-4448-4259-B1CB-66E494CF4EF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E82865BA-8485-40F7-9775-2485ACE3419E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E82865BA-8485-40F7-9775-2485ACE3419E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E82865BA-8485-40F7-9775-2485ACE3419E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E82865BA-8485-40F7-9775-2485ACE3419E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BCC11AD-1DF8-491B-8F41-0AE2EEA362B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BCC11AD-1DF8-491B-8F41-0AE2EEA362B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BCC11AD-1DF8-491B-8F41-0AE2EEA362B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BCC11AD-1DF8-491B-8F41-0AE2EEA362B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
